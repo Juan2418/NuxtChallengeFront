@@ -1,32 +1,42 @@
 <template>
   <div class="container">
     <div>
-      <Logo />
-      <h1 class="title">NuxtCFront</h1>
-      <div class="links">
-        <a
-          href="https://nuxtjs.org/"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="button--green"
-        >
-          Documentation
-        </a>
-        <a
-          href="https://github.com/nuxt/nuxt.js"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="button--grey"
-        >
-          GitHub
-        </a>
-      </div>
+      <input id="email" v-model="email" type="text" name="email" />
+      <input id="password" v-model="password" type="text" name="password" />
+      <button @click="login">Log In</button>
     </div>
   </div>
 </template>
 
 <script>
-export default {}
+import { mapActions, mapState } from 'vuex';
+
+export default {
+  data() {
+    return {
+      email: '',
+      password: '',
+    };
+  },
+  computed: {
+    ...mapState(['articles']),
+  },
+  methods: {
+    login() {
+      this.$auth
+        .loginWith('local', {
+          data: {
+            email: this.email,
+            password: this.password,
+          },
+        })
+        .then(({ data }) => {
+          this.setArticles(data.user.articles);
+        });
+    },
+    ...mapActions('articles', ['setArticles']),
+  },
+};
 </script>
 
 <style>
