@@ -1,17 +1,17 @@
 <template>
   <div class="container">
     <div v-if="$auth.loggedIn">
-      <article v-for="(article, index) in articles.all" :key="index" class="">
-        {{ article.content }}
-      </article>
+      <card :items="articles" />
     </div>
   </div>
 </template>
 
 <script>
 import { mapActions, mapState } from 'vuex';
+import Card from '~/components/card.vue';
 
 export default {
+  components: { Card },
   data() {
     return {
       email: '',
@@ -19,17 +19,24 @@ export default {
     };
   },
   computed: {
-    ...mapState('articles', ['articles']),
+    ...mapState({
+      articles: (state) => state.articles.all,
+    }),
   },
   mounted() {
-    console.log(this.$store.state.articles);
-    if (this.$auth.loggedIn && this.$store.state.articles.all.length === 0) {
-      this.$axios
-        .$get('http://127.0.0.1:8000/api/articles')
-        .then((response) => this.setArticles(response));
+    if (this.isLoggedInButNoArticles()) {
+      this.loadUserArticles();
     }
   },
   methods: {
+    isLoggedInButNoArticles() {
+      return this.$auth.loggedIn && this.articles.length === 0;
+    },
+    loadUserArticles() {
+      this.$axios
+        .$get('http://127.0.0.1:8000/api/articles')
+        .then((response) => this.setArticles(response));
+    },
     login() {
       this.$auth
         .loginWith('local', {
