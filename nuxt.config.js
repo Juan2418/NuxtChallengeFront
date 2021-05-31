@@ -48,7 +48,7 @@ export default {
       local: {
         token: {
           property: 'access_token',
-          // required: true,
+          required: true,
           type: 'Bearer',
         },
         user: {

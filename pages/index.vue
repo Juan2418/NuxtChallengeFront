@@ -1,9 +1,9 @@
 <template>
   <div class="container">
-    <div>
-      <input id="email" v-model="email" type="text" name="email" />
-      <input id="password" v-model="password" type="text" name="password" />
-      <button @click="login">Log In</button>
+    <div v-if="$auth.loggedIn">
+      <article v-for="(article, index) in articles.all" :key="index" class="">
+        {{ article.content }}
+      </article>
     </div>
   </div>
 </template>
@@ -19,7 +19,15 @@ export default {
     };
   },
   computed: {
-    ...mapState(['articles']),
+    ...mapState('articles', ['articles']),
+  },
+  mounted() {
+    console.log(this.$store.state.articles);
+    if (this.$auth.loggedIn && this.$store.state.articles.all.length === 0) {
+      this.$axios
+        .$get('http://127.0.0.1:8000/api/articles')
+        .then((response) => this.setArticles(response));
+    }
   },
   methods: {
     login() {
