@@ -3,7 +3,7 @@
     <div
       v-for="(item, index) in items"
       :key="index"
-      class="max-w-sm w-full lg:max-w-full lg:flex my-4 scale-on-hover"
+      class="max-w-sm lg:max-w-md lg:flex my-4 scale-on-hover"
       @click="load(item)"
     >
       <div
@@ -54,7 +54,9 @@ export default {
     },
   },
   methods: {
-    load(item) {},
+    load(item) {
+      this.$router.push(`/articles/${item.id}`);
+    },
   },
 };
 </script>
