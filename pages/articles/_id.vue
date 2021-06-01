@@ -16,7 +16,7 @@ export default {
   },
   mounted() {
     this.$axios
-      .$get(`articles/${this.id}`)
+      .$get(`/articles/${this.id}`)
       .then((response) => (this.article = response));
   },
   methods: {
