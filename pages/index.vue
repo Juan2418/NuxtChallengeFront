@@ -1,32 +1,58 @@
 <template>
   <div class="container">
-    <div>
-      <Logo />
-      <h1 class="title">NuxtCFront</h1>
-      <div class="links">
-        <a
-          href="https://nuxtjs.org/"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="button--green"
-        >
-          Documentation
-        </a>
-        <a
-          href="https://github.com/nuxt/nuxt.js"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="button--grey"
-        >
-          GitHub
-        </a>
-      </div>
+    <div v-if="$auth.loggedIn">
+      <card :items="articles" />
     </div>
   </div>
 </template>
 
 <script>
-export default {}
+import { mapActions, mapState } from 'vuex';
+import Card from '~/components/card.vue';
+
+export default {
+  components: { Card },
+  middleware: 'auth',
+  data() {
+    return {
+      email: '',
+      password: '',
+    };
+  },
+  computed: {
+    ...mapState({
+      articles: (state) => state.articles.all,
+    }),
+  },
+  mounted() {
+    if (this.isLoggedInButNoArticles()) {
+      this.loadUserArticles();
+    }
+  },
+  methods: {
+    isLoggedInButNoArticles() {
+      return this.$auth.loggedIn && this.articles.length === 0;
+    },
+    loadUserArticles() {
+      this.$axios
+        .$get('http://127.0.0.1:8000/api/articles')
+        .then((response) => this.setArticles(response));
+    },
+    login() {
+      this.$auth
+        .loginWith('local', {
+          data: {
+            email: this.email,
+            password: this.password,
+          },
+        })
+        .then(({ data }) => {
+          this.setArticles(data.user.articles);
+        });
+    },
+    ...mapActions('articles', ['setArticles']),
+  },
+};
 </script>
 
 <style>
